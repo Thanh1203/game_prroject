@@ -1,26 +1,42 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <RouterView v-slot="{Component}">
+    <Transition name="page-slide" mode="out-in">
+      <component :is="Component"/>
+    </Transition>
+  </RouterView>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
   }
 }
 </script>
-
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+#app{
+  height: 100%;
+  width: 100%;
 }
+/* .page-opacity-enter-active,
+.page-opacity-leave-active {
+  transition: 0.6s ease all;
+}
+
+.page-opacity-enter-from,
+.page-opacity-leave-to {
+  opacity: 0;
+} */
+
+.page-slide-leave-active {
+  transition: 0.6s ease all;
+}
+
+.page-slide-enter-from,
+.page-slide-leave-to {
+  opacity: 0;
+  transform: translateY(300px);
+}
+
 </style>

@@ -1,0 +1,41 @@
+*{
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    margin: 0;
+    position: relative;
+    font-family: Roboto, sans-serif-light, "Roboto Condensed", Helvetica, "Helvetica Neue", Arial, sans-serif;
+    color: #938671;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html{
+    height: 100%;
+    overflow: hidden;
+}
+
+body{
+    height: 100%;
+}
+
+.txt_link{
+    text-decoration: none;
+    color: #938671;
+    border-bottom: 1px solid #C226A2;
+    font-weight: 300;
+}
+
+.txt_link:hover {
+    color: #C226A2;
+}
+
+.my-btn {
+    background-color: transparent;
+    border: 0;
+}
+
+.icon {
+    height: 35px;
+    width: 35px;
+}
