@@ -47,7 +47,6 @@ function dragStart(item, ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
     const newItem = cloneItem(item)
-    console.log(newItem.id);
     ev.dataTransfer.setData('itemID', newItem.id)
     setTimeout(() => {
         idCount++

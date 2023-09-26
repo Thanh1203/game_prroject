@@ -83,22 +83,20 @@ let leftScreenX = 0
 
 async function droped (ev){
     ev.preventDefault();
-    topScreenY = ev.y
-    leftScreenX = ev.x
+    topScreenY = ev.y - 37.5
+    leftScreenX = ev.x - 37.5
     const idItemDrop = ev.dataTransfer.getData('itemID')
     await setStyle(idItemDrop)
-    console.log(leftScreenX, topScreenY);
+    await handleLogicDrop(idItemDrop)
 }
 
 
 function setStyle(id) {
-    console.log(id);
     setTimeout(() => {
-        console.log(tempElement.value);
         tempElement.value.find((item) => {
             if (item.id == id) {
-                item.x = leftScreenX - 37.5,
-                item.y = topScreenY - 37.5
+                item.x = leftScreenX,
+                item.y = topScreenY
                 return {
                     position: 'absolute',
                     top: `${item.y}px`,
@@ -106,7 +104,7 @@ function setStyle(id) {
                 }
             }
         })
-    }, 1);
+    }, 0.1);
 }
 
 async function dragStart(item, ev) {
@@ -114,6 +112,36 @@ async function dragStart(item, ev) {
     ev.dataTransfer.effectAllowed = 'move'
     ev.dataTransfer.setData('itemID', item.id)
 }
+
+
+function handleLogicDrop(id) {
+    let selectItem
+    setTimeout(() => {
+        tempElement.value.forEach(item => {
+            if (item.id == id) {
+                selectItem = item
+            }
+        });
+        tempElement.value.forEach(item => {
+            if (item.id != selectItem.id && checkleft(selectItem, item.x) && checktop(selectItem, item.y)) {
+                console.log(item.name, selectItem.name);
+            }
+        });
+    }, 0.25);
+}
+
+function checktop(data, value) {
+    const start = data.y - 60
+    const end = data.y + 60
+    return value >= start && value <= end;
+}
+
+function checkleft(data, value) {
+    const start = data.x - 60
+    const end = data.x + 60
+    return value >= start && value <= end;
+}
+
 
 </script>
 <style>
