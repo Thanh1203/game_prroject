@@ -12,18 +12,44 @@
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
         <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
+        <draggable v-model="tempElement" group="natureElements" 
+        item-key="id" class="drop-box"
+        @drop="droped($event)">
+            <template #item="{ element }" >
+                <div class="item-ele" 
+                :style="{
+                    position: 'absolute',
+                    top: `${element.y}px`,
+                    left: `${element.x}px`
+                }" 
+                :id="`${ element.id }`" 
+                @dragstart="dragStart(element, $event)">
+                    <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
+                    <p>{{ element.name }}</p>
+                </div>
+            </template>
+        </draggable>
     </div>
 </template>
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
+import draggable from 'vuedraggable'
+
 
 let isFullscreen = ref(false)
-
 const store = useStore();
-const natureElements = store.getters['natureElements'];
-const natureElementsLength = natureElements.length;
+let tempElement = computed({
+    get: () => store.state.natureElesTemp,
+    set: (data) => store.dispatch('updateNature', data)
+})
 
+const natureElements = computed({
+    get: () => store.state.natureElements,
+});
+const natureElementsLength = natureElements.value.length;
+
+// function handle
 const fullScreen = () => {
     isFullscreen.value = !isFullscreen.value
     if (!document.fullscreenElement) {
@@ -51,12 +77,49 @@ const fullScreen = () => {
     }
 }
 
+let topScreenY = 0
+let leftScreenX = 0
+
+
+async function droped (ev){
+    ev.preventDefault();
+    topScreenY = ev.y
+    leftScreenX = ev.x
+    const idItemDrop = ev.dataTransfer.getData('itemID')
+    await setStyle(idItemDrop)
+    console.log(leftScreenX, topScreenY);
+}
+
+
+function setStyle(id) {
+    console.log(id);
+    setTimeout(() => {
+        console.log(tempElement.value);
+        tempElement.value.find((item) => {
+            if (item.id == id) {
+                item.x = leftScreenX - 37.5,
+                item.y = topScreenY - 37.5
+                return {
+                    position: 'absolute',
+                    top: `${item.y}px`,
+                    left: `${item.x}px`
+                }
+            }
+        })
+    }, 1);
+}
+
+async function dragStart(item, ev) {
+    ev.dataTransfer.dropEffect = 'move'
+    ev.dataTransfer.effectAllowed = 'move'
+    ev.dataTransfer.setData('itemID', item.id)
+}
 
 </script>
 <style>
 .play-container {
     height: 100%;
-    width: 78%;
+    width: calc(100% - 280px);
     background-image: url(../../assets/workspace-background.png);
     position: relative;
     top: 0;
@@ -98,6 +161,7 @@ const fullScreen = () => {
     position: absolute;
     top: 10px;
     left: 10px;
+    z-index: 2;
 }
 
 .play-count{
@@ -110,5 +174,20 @@ const fullScreen = () => {
     font-size: 72px;
     margin: 0;
     opacity: 0.6;
+}
+
+.item-ele{
+    width: 75px;
+    height: 75px;
+    background-color: rgb(226, 226, 228);
+    border-radius: 50%;
+}
+
+.item-ele > p {
+    margin: 0;
+}
+
+.drop-box {
+    height: 100%;
 }
 </style>

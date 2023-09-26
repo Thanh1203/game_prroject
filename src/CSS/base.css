@@ -39,3 +39,14 @@ body{
     height: 35px;
     width: 35px;
 }
+
+.ele-img {
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+}
+
+.sortable-ghost {
+    display: none;
+    opacity: 0;
+}

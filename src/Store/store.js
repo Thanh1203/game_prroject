@@ -20,9 +20,24 @@ const store = createStore({
         img: "water.png",
       },
     ],
+    natureElesTemp: [],
   },
   getters: {
-    natureElements: (state) => state.natureElements,
+    getNatureElements: (state) => state.natureElements,
+    getNatureElesTemp: (state) => state.natureElesTemp,
+  },
+  mutations: {
+    update(state, data) {
+      state.natureElesTemp = data;
+    },
+    insert(state, data) {
+      state.natureElements.push(data);
+    },
+  },
+  actions: {
+    updateNature({ commit }, data) {
+      commit("update", data);
+    },
   },
 });
 
