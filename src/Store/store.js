@@ -38,6 +38,9 @@ const store = createStore({
     updateNature({ commit }, data) {
       commit("update", data);
     },
+    insertNature({ commit }, data) {
+      commit("insert", data);
+    },
   },
 });
 

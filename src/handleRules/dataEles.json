@@ -1,0 +1,34 @@
+{
+    "dataElements" : [
+        {
+            "key": ["water", "fire"],
+            "name": "steam",
+            "img": "steam.png"
+        },
+        {
+            "key": ["water", "earth"],
+            "name": "mud",
+            "img": "mud.png"
+        },
+        {
+            "key": ["fire", "air"],
+            "name": "energy",
+            "img": "energy.png"
+        },
+        {
+            "key": ["air", "earth"],
+            "name": "dust",
+            "img": "dust.png"
+        },
+        {
+            "key": ["water", "air"],
+            "name": "rain",
+            "img": "rain.png"
+        },
+        {
+            "key": ["fire", "mud"],
+            "name": "brick",
+            "img": "brick.png"
+        }
+    ]
+}

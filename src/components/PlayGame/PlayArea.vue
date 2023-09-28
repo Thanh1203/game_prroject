@@ -35,7 +35,7 @@
 import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
-
+import handlerule from '@/handleRules/handleRule.js'
 
 let isFullscreen = ref(false)
 const store = useStore();
@@ -116,15 +116,30 @@ async function dragStart(item, ev) {
 
 function handleLogicDrop(id) {
     let selectItem
+    let mixEle = []
+    let count = 0
     setTimeout(() => {
         tempElement.value.forEach(item => {
             if (item.id == id) {
                 selectItem = item
+                mixEle.push(item.name)
             }
         });
         tempElement.value.forEach(item => {
             if (item.id != selectItem.id && checkleft(selectItem, item.x) && checktop(selectItem, item.y)) {
-                console.log(item.name, selectItem.name);
+                count++
+                if (count < 2) {
+                    mixEle.push(item.name)
+                    if (count > 0) {
+                        const newEle = handlerule(mixEle)
+                        if (newEle !== null) {
+                            const idDelete = deleteEle(selectItem.id, item.id)
+                            mapNewEle(newEle, idDelete)
+                        }
+                    }
+                } else {
+                    return
+                }
             }
         });
     }, 0.25);
@@ -142,6 +157,45 @@ function checkleft(data, value) {
     return value >= start && value <= end;
 }
 
+function mapNewEle(ele, eleid) {
+    const data = {
+        id: eleid,
+        name: ele.name,
+        img: ele.img,
+        x: eleid.x,
+        y: eleid.y
+    }
+    const otherData = {
+        name: data.name,
+        img: data.img
+    }
+    tempElement.value.push(data)
+    if (!natureElements.value.includes(data.name)) {
+        store.dispatch('insertNature', otherData)
+    }
+}
+
+function deleteEle(eleid1, eleid2) {
+    let value
+    if (eleid1 < eleid2) {
+        value = eleid1
+        handleDelte(eleid1)
+        handleDelte(eleid2)
+    } else {
+        value = eleid2
+        handleDelte(eleid2)
+        handleDelte(eleid1)
+    }
+    return value
+}
+
+function handleDelte(id) {
+    tempElement.value.forEach((ele, index) => {
+        if (ele.id === id) {
+            tempElement.value.splice(index, 1)
+        }
+    })
+}
 
 </script>
 <style>
