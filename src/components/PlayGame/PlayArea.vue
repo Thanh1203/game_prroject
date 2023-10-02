@@ -12,18 +12,12 @@
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
         <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
-        <draggable v-model="tempElement" group="natureElements" 
-        item-key="id" class="drop-box"
-        @drop="droped($event)">
+        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box"
+        @drop="dropping($event)">
             <template #item="{ element }" >
-                <div class="item-ele" 
-                :style="{
-                    position: 'absolute',
-                    top: `${element.y}px`,
-                    left: `${element.x}px`
-                }" 
-                :id="`${ element.id }`" 
-                @dragstart="dragStart(element, $event)">
+                <div class="item-ele" :id="`${ element.id }`" 
+                @dragstart="dragStart(element, $event)" 
+                style="opacity: 0;">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <p>{{ element.name }}</p>
                 </div>
@@ -32,22 +26,20 @@
     </div>
 </template>
 <script setup>
-import { computed, ref } from 'vue';
+import { computed, ref} from 'vue';
 import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
 import handlerule from '@/handleRules/handleRule.js'
+import storageLocal from '@/Store/storageLocal'
 
 let isFullscreen = ref(false)
 const store = useStore();
-let tempElement = computed({
-    get: () => store.state.natureElesTemp,
-    set: (data) => store.dispatch('updateNature', data)
-})
-
 const natureElements = computed({
     get: () => store.state.natureElements,
-});
-const natureElementsLength = natureElements.value.length;
+})
+const natureElementsLength = computed(() => store.state.natureElements.length);
+let combineNature = ref(storageLocal.getCombineNatureEle())
+
 
 // function handle
 const fullScreen = () => {
@@ -77,124 +69,123 @@ const fullScreen = () => {
     }
 }
 
-let topScreenY = 0
-let leftScreenX = 0
-
-
-async function droped (ev){
+async function dropping(ev) {
     ev.preventDefault();
-    topScreenY = ev.y - 37.5
-    leftScreenX = ev.x - 37.5
-    const idItemDrop = ev.dataTransfer.getData('itemID')
-    await setStyle(idItemDrop)
-    await handleLogicDrop(idItemDrop)
+    const data = JSON.parse(ev.dataTransfer.getData('item'));
+    data.x = ev.clientX - 37.5;
+    data.y = ev.clientY - 37.5;
+    const itemDrop = document.getElementById(data.id);
+    if (itemDrop) {
+        itemDrop.style.opacity = 0;
+    }
+    await setStyle(data.id, data.x, data.y);
+    if (itemDrop) {
+        itemDrop.style.opacity = 1;
+    }
+    handleLogicDrop(data)
+    storageLocal.setCombineNatureEle(combineNature.value)
 }
 
-
-function setStyle(id) {
-    setTimeout(() => {
-        tempElement.value.find((item) => {
-            if (item.id == id) {
-                item.x = leftScreenX,
-                item.y = topScreenY
-                return {
-                    position: 'absolute',
-                    top: `${item.y}px`,
-                    left: `${item.x}px`
+function setStyle(id, x, y) {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            const itemDrop = document.getElementById(id);
+            itemDrop.style.opacity = 1;
+            itemDrop.style.position = 'absolute';
+            itemDrop.style.top = `${y}px`;
+            itemDrop.style.left = `${x}px`;
+            combineNature.value.find(item => {
+                if (item.id == id) {
+                    item.x = x,
+                    item.y = y
                 }
-            }
-        })
-    }, 0.1);
+            })
+            resolve();
+        }, 1);
+    });
 }
 
-async function dragStart(item, ev) {
+function dragStart(item, ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
-    ev.dataTransfer.setData('itemID', item.id)
+    ev.dataTransfer.setData('item', JSON.stringify(item))
 }
 
-
-function handleLogicDrop(id) {
-    let selectItem
-    let mixEle = []
-    let count = 0
-    setTimeout(() => {
-        tempElement.value.forEach(item => {
-            if (item.id == id) {
-                selectItem = item
-                mixEle.push(item.name)
-            }
-        });
-        tempElement.value.forEach(item => {
-            if (item.id != selectItem.id && checkleft(selectItem, item.x) && checktop(selectItem, item.y)) {
-                count++
-                if (count < 2) {
-                    mixEle.push(item.name)
-                    if (count > 0) {
-                        const newEle = handlerule(mixEle)
-                        if (newEle !== null) {
-                            const idDelete = deleteEle(selectItem.id, item.id)
-                            mapNewEle(newEle, idDelete)
-                        }
-                    }
-                } else {
-                    return
-                }
-            }
-        });
-    }, 0.25);
+function handleLogicDrop(itemdrop) {
+    let natureMix = [itemdrop.name]
+    let tempNature
+    combineNature.value.filter(item => {
+        if (item.id != itemdrop.id && checktop(itemdrop.y, item.y) && checkleft(itemdrop.x, item.x)) {
+            tempNature = item
+            natureMix.push(item.name)
+        }
+    })
+    if (natureMix.length >= 2) {
+        const newNature = handlerule(natureMix)
+        if (newNature) {
+            const newIdNature = getNewIdNature(itemdrop.id, tempNature.id)
+            mapNewEle(newNature, newIdNature, itemdrop)
+        }
+    }
 }
 
 function checktop(data, value) {
-    const start = data.y - 60
-    const end = data.y + 60
+    const start = data - 60
+    const end = data + 60
     return value >= start && value <= end;
 }
 
 function checkleft(data, value) {
-    const start = data.x - 60
-    const end = data.x + 60
+    const start = data - 60
+    const end = data + 60
     return value >= start && value <= end;
 }
 
-function mapNewEle(ele, eleid) {
+function getNewIdNature(id1, id2) {
+    let result
+    if (id1 > id2) {
+        result = id2
+    } else {
+        result = id1
+    }
+    handleDelte(id1),
+    handleDelte(id2)
+    return result
+}
+
+function mapNewEle(currentEle, idEle, positionEle) {
     const data = {
-        id: eleid,
-        name: ele.name,
-        img: ele.img,
-        x: eleid.x,
-        y: eleid.y
+        id: idEle,
+        name: currentEle.name,
+        img: currentEle.img,
+        x: positionEle.x,
+        y: positionEle.y
     }
     const otherData = {
         name: data.name,
         img: data.img
     }
-    tempElement.value.push(data)
-    if (!natureElements.value.includes(data.name)) {
+    combineNature.value.push(data)
+    storageLocal.setCombineNatureEle(combineNature.value)
+    const check =  natureElements.value.find(item => {
+        return item.name == otherData.name
+    })
+    if (!check) {
         store.dispatch('insertNature', otherData)
     }
 }
 
-function deleteEle(eleid1, eleid2) {
-    let value
-    if (eleid1 < eleid2) {
-        value = eleid1
-        handleDelte(eleid1)
-        handleDelte(eleid2)
-    } else {
-        value = eleid2
-        handleDelte(eleid2)
-        handleDelte(eleid1)
-    }
-    return value
-}
-
 function handleDelte(id) {
-    tempElement.value.forEach((ele, index) => {
+    combineNature.value.forEach((ele, index) => {
         if (ele.id === id) {
-            tempElement.value.splice(index, 1)
+            combineNature.value.splice(index, 1)
         }
     })
+}
+
+const clearEle = () => {
+    combineNature.value = []
+    storageLocal.setCombineNatureEle([])
 }
 
 </script>
@@ -215,6 +206,7 @@ function handleDelte(id) {
     position: absolute;
     bottom: 10px;
     right: 10px;
+    z-index: 2;
 }
 
 .play-icon > a {

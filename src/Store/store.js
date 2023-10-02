@@ -1,43 +1,21 @@
 import { createStore } from "vuex";
+import storageLocal from "./storageLocal";
 
 const store = createStore({
   state: {
-    natureElements: [
-      {
-        name: "air",
-        img: "air.png",
-      },
-      {
-        name: "earth",
-        img: "earth.png",
-      },
-      {
-        name: "fire",
-        img: "fire.png",
-      },
-      {
-        name: "water",
-        img: "water.png",
-      },
-    ],
-    natureElesTemp: [],
+    natureElements: storageLocal.getNatureEle(),
+    combineNature: storageLocal.getCombineNatureEle(),
   },
   getters: {
     getNatureElements: (state) => state.natureElements,
-    getNatureElesTemp: (state) => state.natureElesTemp,
   },
   mutations: {
-    update(state, data) {
-      state.natureElesTemp = data;
-    },
     insert(state, data) {
       state.natureElements.push(data);
+      storageLocal.setNatureEle(state.natureElements);
     },
   },
   actions: {
-    updateNature({ commit }, data) {
-      commit("update", data);
-    },
     insertNature({ commit }, data) {
       commit("insert", data);
     },

@@ -11,7 +11,7 @@
         :sort="false" :clone="cloneItem"
         >
             <template #item="{ element }">
-                <div class="nature-ele" @dragstart="dragStart(element, $event)" >
+                <div class="nature-ele" @dragstart="dragStart(element, $event)" @drag="draging($event)">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <div class="nature-ele-name">{{ element.name }}</div>
                 </div>
@@ -43,11 +43,16 @@ const cloneItem = (item) => {
     return newItem;
 }
 
+function draging(ev) {
+    const itemDrag = ev.target
+    itemDrag.id = idCount
+}
+
 function dragStart(item, ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
-    const newItem = cloneItem(item)
-    ev.dataTransfer.setData('itemID', newItem.id)
+    const newItem = JSON.stringify(cloneItem(item))
+    ev.dataTransfer.setData('item', newItem)
     setTimeout(() => {
         idCount++
     }, 1);
@@ -107,4 +112,5 @@ function dragStart(item, ev) {
     font-weight: 300;
     cursor: default;
 }
+
 </style>

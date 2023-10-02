@@ -46,7 +46,6 @@ body{
     cursor: pointer;
 }
 
-.sortable-ghost {
-    display: none;
-    opacity: 0;
+.sortable-ghost{
+    opacity: 0 !important;
 }

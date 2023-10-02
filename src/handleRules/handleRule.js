@@ -3,29 +3,16 @@ import dataEles from "./dataEles.json";
 const Elesdata = dataEles.dataElements;
 
 function getEleKey(data) {
-  let getKey = [];
-  let position;
-  let result = null;
+  let result;
   Elesdata.forEach((element) => {
-    getKey.push(element.key);
-  });
-  getKey.forEach((item, index) => {
-    if (handleCheck(item, data)) {
-      position = index;
-    }
-  });
-  Elesdata.forEach((ele, index) => {
-    if (index == position) {
-      result = ele;
+    if (element.key.length == data.length && handleCheck(element.key, data)) {
+      result = element;
     }
   });
   return result;
 }
 
 function handleCheck(itemKey, data) {
-  if (itemKey.length !== data.length) {
-    return false;
-  }
   return itemKey.every((ele) => data.includes(ele));
 }
 
