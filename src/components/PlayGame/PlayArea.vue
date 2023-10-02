@@ -17,7 +17,11 @@
             <template #item="{ element }" >
                 <div class="item-ele" :id="`${ element.id }`" 
                 @dragstart="dragStart(element, $event)" 
-                style="opacity: 0;">
+                v-show="element.x !== 0" :style="{
+                    position: 'absolute',
+                    top: `${element.y}px`,
+                    left: `${element.x}px`
+                }">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <p>{{ element.name }}</p>
                 </div>
@@ -39,7 +43,6 @@ const natureElements = computed({
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
 let combineNature = ref(storageLocal.getCombineNatureEle())
-
 
 // function handle
 const fullScreen = () => {

@@ -4,7 +4,6 @@ import storageLocal from "./storageLocal";
 const store = createStore({
   state: {
     natureElements: storageLocal.getNatureEle(),
-    combineNature: storageLocal.getCombineNatureEle(),
   },
   getters: {
     getNatureElements: (state) => state.natureElements,

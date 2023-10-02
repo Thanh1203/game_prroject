@@ -23,12 +23,24 @@
 import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
 import { computed, ref } from 'vue';
+import storageLocal from '@/Store/storageLocal';
 
 const alphabets = ref('abcdefghijklmnopqrstuvwxyz'.toUpperCase().split(''));
 const store = useStore()
 
+const getId = storageLocal.getCombineNatureEle()
+let idCount
+let temp = []
 
-let idCount = 0
+if (getId.length == 0) {
+    idCount = 0
+} else {
+    getId.forEach(item => {
+        temp.push(item.id)
+    })
+    idCount = Math.max(...temp) + 1
+}
+
 
 const natureElements = computed({
     get: () => store.state.natureElements,
