@@ -17,10 +17,11 @@
             <template #item="{ element }" >
                 <div class="item-ele" :id="`${ element.id }`" 
                 @dragstart="dragStart(element, $event)" 
-                v-show="element.x !== 0" :style="{
+                :style="{
                     position: 'absolute',
                     top: `${element.y}px`,
-                    left: `${element.x}px`
+                    left: `${element.x}px`,
+                    opacity: element.x === 0 ? 0 : 1
                 }">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <p>{{ element.name }}</p>
