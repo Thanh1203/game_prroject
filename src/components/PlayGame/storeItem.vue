@@ -2,13 +2,13 @@
     <div class="slide-store">
         <div class="alphabet">
             <ul class="alphabet-list">
-                <li v-for="(alphabet, index) in alphabets" :key="index">{{ alphabet }}</li>
+                <li v-for="(alphabet, index) in alphabets" :key="index" @click="scrollList">{{ alphabet }}</li>
             </ul>
         </div>
         <draggable v-model="natureEleSort" :group="{ name: 'natureElements', pull: 'clone'}" 
         item-key="name" class="element-container" :sort="false" :clone="cloneNature" @change="log">
             <template #item="{ element }">
-                <div class="nature-ele" @dragstart="dragStart($event)">
+                <div class="nature-ele" @dragstart="dragStart($event)" :name="`${element.name}`">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <div class="nature-ele-name">{{ element.name }}</div>
                 </div>
@@ -25,6 +25,13 @@ import storageLocal from '@/Store/storageLocal';
 const alphabets = ref('abcdefghijklmnopqrstuvwxyz'.toUpperCase().split(''));
 const store = useStore()
 
+//handle drag
+const natureElements = computed({
+    get: () => store.state.natureElements,
+    set: (data) => store.commit("update",data)
+})
+
+
 const getId = storageLocal.getCombineNatureEle()
 let idCount
 let temp = []
@@ -37,11 +44,6 @@ if (getId.length == 0) {
     })
     idCount = Math.max(...temp) + 1
 }
-
-const natureElements = computed({
-    get: () => store.state.natureElements,
-    set: (data) => store.commit("update",data)
-})
 
 const natureEleSort = computed(() => {
     return natureElements.value.slice().sort(function (a, b) {
@@ -91,6 +93,19 @@ function log(ev) {
     }
 }
 
+//handle scroll
+function scrollList(ev) {
+    const char = ev.target.innerHTML.toLowerCase()
+    const ele = natureEleSort.value.find((item) => item.name.startsWith(char))
+    if (ele) {
+        const htmlEle = document.getElementsByName(ele.name);
+        if (htmlEle.length > 0) {
+            htmlEle[0].scrollIntoView({
+                behavior: "smooth",
+            });
+        }
+    }
+}
 </script>
 <style>
 .slide-store{
