@@ -12,7 +12,7 @@
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
         <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
-        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box" @drop="drop"> 
+        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box" @drop="drop" @change="log"> 
             <template #item="{ element }" >
                 <div class="item-ele" :id="`${ element.id }`" 
                 :style="{
@@ -21,7 +21,7 @@
                     left: `${element.x}px`,
                     position: 'absolute'
                 }" draggable="true" @dragstart="dragstart($event)">
-                    <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
+                    <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img-play">
                     <p>{{ element.name }}</p>
                 </div>
             </template>
@@ -77,8 +77,8 @@ async function drop(ev) {
     const idItemDrop = ev.dataTransfer.getData('itemDragId')
     combineNature.value.find(item => {
         if (item.id == parseInt(idItemDrop)) {
-            item.x = ev.x - 37.5
-            item.y = ev.y - 37.5
+            item.x = ev.x - 50
+            item.y = ev.y - 50
         }
     })
     await setStyle(idItemDrop, ev.x, ev.y);
@@ -86,19 +86,24 @@ async function drop(ev) {
     storageLocal.setCombineNatureEle(combineNature.value)
 }
 
-
 function setStyle(id, x, y) {
     return new Promise((resolve) => {
         setTimeout(() => {
             combineNature.value.find(item => {
                 if (item.id == parseInt(id)) {
-                    item.x = x-37.5,
-                    item.y = y - 37.5
+                    item.x = x- 50,
+                    item.y = y - 50
                 }
             })
             resolve();
         }, 1);
     });
+}
+
+function log(ev) {
+    if (ev.removed) {
+        storageLocal.setCombineNatureEle(combineNature.value)
+    }
 }
 
 //get data item
@@ -252,18 +257,19 @@ const clearEle = () => {
 }
 
 .item-ele{
-    width: 75px;
-    height: 75px;
-    background-color: rgb(226, 226, 228);
-    border-radius: 50%;
+    width: 100px;
+    height: 100px;
 }
 
 .item-ele > p {
     margin: 0;
 }
 
+.item-ele .ele-img-play{
+    height: 75px;
+}
+
 .drop-box {
     height: 100%;
-    
 }
 </style>

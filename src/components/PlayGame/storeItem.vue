@@ -5,8 +5,8 @@
                 <li v-for="(alphabet, index) in alphabets" :key="index">{{ alphabet }}</li>
             </ul>
         </div>
-        <draggable v-model="natureElements" :group="{ name: 'natureElements', pull: 'clone', put: false }" 
-        item-key="name" class="element-container" :sort="false" :clone="cloneNature">
+        <draggable v-model="natureEleSort" :group="{ name: 'natureElements', pull: 'clone'}" 
+        item-key="name" class="element-container" :sort="false" :clone="cloneNature" @change="log">
             <template #item="{ element }">
                 <div class="nature-ele" @dragstart="dragStart($event)">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
@@ -40,7 +40,22 @@ if (getId.length == 0) {
 
 const natureElements = computed({
     get: () => store.state.natureElements,
+    set: (data) => store.commit("update",data)
 })
+
+const natureEleSort = computed(() => {
+    return natureElements.value.slice().sort(function (a, b) {
+        var nameA = a.name.toUpperCase();
+        var nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        return 0;
+    });
+});
 
 const cloneNature = (item) => {
     const newItem = {
@@ -64,6 +79,16 @@ function dragStart(ev) {
         idCount++
     }, 1);
     ev.dataTransfer.setData("itemDragId", dragItem.id)
+}
+
+function log(ev) {
+    if (ev.added) {
+        natureElements.value.forEach((item, index) => {
+            if (Object.prototype.hasOwnProperty.call(item, 'id')) {
+                natureElements.value.splice(index, 1);
+            }
+        });
+    }
 }
 
 </script>
@@ -102,8 +127,13 @@ function dragStart(ev) {
     cursor: pointer;
 }
 
-.element-container {
+.slide-store .element-container {
     width: 250px;
+    overflow-y: scroll;
+}
+
+.slide-store .element-container::-webkit-scrollbar {
+    display: none;
 }
 
 .nature-ele {

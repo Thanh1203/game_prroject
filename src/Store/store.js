@@ -13,6 +13,9 @@ const store = createStore({
       state.natureElements.push(data);
       storageLocal.setNatureEle(state.natureElements);
     },
+    update(state, data) {
+      state.natureElements = data;
+    },
   },
   actions: {
     insertNature({ commit }, data) {
