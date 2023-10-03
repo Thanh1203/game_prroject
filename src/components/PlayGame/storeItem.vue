@@ -5,13 +5,10 @@
                 <li v-for="(alphabet, index) in alphabets" :key="index">{{ alphabet }}</li>
             </ul>
         </div>
-        <draggable v-model="natureElements" 
-        :group="{ name: 'natureElements', pull: 'clone', put: false }" 
-        item-key="name" class="element-container"
-        :sort="false" :clone="cloneItem"
-        >
+        <draggable v-model="natureElements" :group="{ name: 'natureElements', pull: 'clone', put: false }" 
+        item-key="name" class="element-container" :sort="false" :clone="cloneNature">
             <template #item="{ element }">
-                <div class="nature-ele" @dragstart="dragStart(element, $event)" @drag="draging($event)">
+                <div class="nature-ele" @dragstart="dragStart($event)">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <div class="nature-ele-name">{{ element.name }}</div>
                 </div>
@@ -41,33 +38,32 @@ if (getId.length == 0) {
     idCount = Math.max(...temp) + 1
 }
 
-
 const natureElements = computed({
     get: () => store.state.natureElements,
 })
 
-const cloneItem = (item) => {
+const cloneNature = (item) => {
     const newItem = {
         id: idCount,
         name: item.name,
         img: item.img,
+        x: 0,
+        y: 0
     };
     return newItem;
 }
 
-function draging(ev) {
-    const itemDrag = ev.target
-    itemDrag.id = idCount
-}
-
-function dragStart(item, ev) {
+function dragStart(ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
-    const newItem = JSON.stringify(cloneItem(item))
-    ev.dataTransfer.setData('item', newItem)
+    // const newItem = JSON.stringify(cloneItem(item))
+    // ev.dataTransfer.setData('item', newItem)
+    const dragItem = ev.target
+    dragItem.id = idCount
     setTimeout(() => {
         idCount++
     }, 1);
+    ev.dataTransfer.setData("itemDragId", dragItem.id)
 }
 
 </script>

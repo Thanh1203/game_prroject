@@ -12,17 +12,15 @@
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
         <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
-        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box"
-        @drop="dropping($event)">
+        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box" @drop="drop"> 
             <template #item="{ element }" >
                 <div class="item-ele" :id="`${ element.id }`" 
-                @dragstart="dragStart(element, $event)" 
                 :style="{
-                    position: 'absolute',
+                    opacity: element.x === 0 ? 0 : 1,
                     top: `${element.y}px`,
                     left: `${element.x}px`,
-                    opacity: element.x === 0 ? 0 : 1
-                }">
+                    position: 'absolute'
+                }" draggable="true" @dragstart="dragstart($event)">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img">
                     <p>{{ element.name }}</p>
                 </div>
@@ -44,6 +42,7 @@ const natureElements = computed({
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
 let combineNature = ref(storageLocal.getCombineNatureEle())
+
 
 // function handle
 const fullScreen = () => {
@@ -73,35 +72,28 @@ const fullScreen = () => {
     }
 }
 
-async function dropping(ev) {
+async function drop(ev) {
     ev.preventDefault();
-    const data = JSON.parse(ev.dataTransfer.getData('item'));
-    data.x = ev.clientX - 37.5;
-    data.y = ev.clientY - 37.5;
-    const itemDrop = document.getElementById(data.id);
-    if (itemDrop) {
-        itemDrop.style.opacity = 0;
-    }
-    await setStyle(data.id, data.x, data.y);
-    if (itemDrop) {
-        itemDrop.style.opacity = 1;
-    }
-    handleLogicDrop(data)
+    const idItemDrop = ev.dataTransfer.getData('itemDragId')
+    combineNature.value.find(item => {
+        if (item.id == parseInt(idItemDrop)) {
+            item.x = ev.x - 37.5
+            item.y = ev.y - 37.5
+        }
+    })
+    await setStyle(idItemDrop, ev.x, ev.y);
+    handleLogicDrop(idItemDrop)
     storageLocal.setCombineNatureEle(combineNature.value)
 }
+
 
 function setStyle(id, x, y) {
     return new Promise((resolve) => {
         setTimeout(() => {
-            const itemDrop = document.getElementById(id);
-            itemDrop.style.opacity = 1;
-            itemDrop.style.position = 'absolute';
-            itemDrop.style.top = `${y}px`;
-            itemDrop.style.left = `${x}px`;
             combineNature.value.find(item => {
-                if (item.id == id) {
-                    item.x = x,
-                    item.y = y
+                if (item.id == parseInt(id)) {
+                    item.x = x-37.5,
+                    item.y = y - 37.5
                 }
             })
             resolve();
@@ -109,25 +101,34 @@ function setStyle(id, x, y) {
     });
 }
 
-function dragStart(item, ev) {
+//get data item
+function dragstart(ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
-    ev.dataTransfer.setData('item', JSON.stringify(item))
+    ev.dataTransfer.setData("itemDragId", ev.target.id)
 }
 
-function handleLogicDrop(itemdrop) {
+
+// handle logic
+function handleLogicDrop(id) {
+    let itemdrop
+    combineNature.value.find(item => {
+        if (item.id == parseInt(id)) {
+            itemdrop = item
+        }
+    })
     let natureMix = [itemdrop.name]
-    let tempNature
+    let tempNature = [itemdrop.id]
     combineNature.value.filter(item => {
         if (item.id != itemdrop.id && checktop(itemdrop.y, item.y) && checkleft(itemdrop.x, item.x)) {
-            tempNature = item
+            tempNature.push(item.id)
             natureMix.push(item.name)
         }
     })
     if (natureMix.length >= 2) {
         const newNature = handlerule(natureMix)
         if (newNature) {
-            const newIdNature = getNewIdNature(itemdrop.id, tempNature.id)
+            const newIdNature = getNewIdNature(tempNature)
             mapNewEle(newNature, newIdNature, itemdrop)
         }
     }
@@ -145,15 +146,11 @@ function checkleft(data, value) {
     return value >= start && value <= end;
 }
 
-function getNewIdNature(id1, id2) {
-    let result
-    if (id1 > id2) {
-        result = id2
-    } else {
-        result = id1
-    }
-    handleDelte(id1),
-    handleDelte(id2)
+function getNewIdNature(arr) {
+    const result = Math.min(...arr)
+    arr.forEach(item => {
+        handleDelte(item)
+    })
     return result
 }
 
@@ -267,5 +264,6 @@ const clearEle = () => {
 
 .drop-box {
     height: 100%;
+    
 }
 </style>

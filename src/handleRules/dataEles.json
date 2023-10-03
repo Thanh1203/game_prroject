@@ -29,6 +29,11 @@
             "key": ["fire", "mud"],
             "name": "brick",
             "img": "brick.png"
+        },
+        {
+            "key": ["water", "fire", "earth"],
+            "name": "logo",
+            "img": "logo.png"
         }
     ]
 }
