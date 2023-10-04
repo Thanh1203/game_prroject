@@ -211,8 +211,7 @@ const clearEle = () => {
 
 function resetGame() {
     clearEle()
-    const data = defaultData
-    storageLocal.setNatureEle(data)
+    storageLocal.setNatureEle(defaultData)
     store.commit('update', storageLocal.getNatureEle())
 }
 </script>
