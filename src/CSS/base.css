@@ -49,3 +49,8 @@ body{
 .sortable-ghost{
     opacity: 0 !important;
 }
+
+.item-ele {
+    width: 100px;
+    height: 100px;
+}

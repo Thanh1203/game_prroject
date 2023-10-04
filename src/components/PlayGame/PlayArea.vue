@@ -1,9 +1,10 @@
 <template>
     <div class="play-container">
         <div class="play-icon">
-            <a href="https://littlealchemy2.com/" class="icon"></a>
             <div class="icon iconClear" @click="clearEle"></div>
-            <div class="icon iconMenu"></div>
+        </div>
+        <div class="play-reset">
+            <button class="btn btn-primary btn-reset btn-sm" type="reset" value="Reset" @click="resetGame">Reset</button>
         </div>
         <div class="play-content">
             <a href="https://littlealchemy2.com/" class="txt_link">Little Alchemy 2 is out now!</a>
@@ -12,7 +13,8 @@
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
         <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
-        <draggable v-model="combineNature" group="natureElements" item-key="id" class="drop-box" @drop="drop" @change="log"> 
+        <draggable v-model="combineNature" group="natureElements" 
+        item-key="id" class="drop-box" @drop="drop" @change="log" style="height: 100%;"> 
             <template #item="{ element }" >
                 <div class="item-ele" :id="`${ element.id }`" 
                 :style="{
@@ -34,6 +36,7 @@ import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
 import handlerule from '@/handleRules/handleRule.js'
 import storageLocal from '@/Store/storageLocal'
+import { defaultData } from "@/contant/keyLocalStorage";
 
 let isFullscreen = ref(false)
 const store = useStore();
@@ -189,11 +192,18 @@ function handleDelte(id) {
     })
 }
 
+//handle option
 const clearEle = () => {
     combineNature.value = []
     storageLocal.setCombineNatureEle([])
 }
 
+const resetGame = () => {
+    combineNature.value = []
+    storageLocal.setCombineNatureEle([])
+    store.dispatch("updateNature", defaultData)
+    storageLocal.setNatureEle(defaultData)
+}
 </script>
 <style>
 .play-container {
@@ -205,7 +215,7 @@ const clearEle = () => {
     left: 0;
 }
 
-.play-icon{
+.play-container .play-icon{
     display: flex;
     flex-direction: column;
     width: 35px;
@@ -215,50 +225,46 @@ const clearEle = () => {
     z-index: 2;
 }
 
-.play-icon > a {
-    background-image: url(../../assets/la2button.png);
-    margin-top: 10px;
-    
-}
-
-.iconClear {
+.play-container .play-icon .iconClear {
     background-image: url(../../assets/clear.png);
     margin-top: 10px;
 }
 
-.iconMenu {
-    background-image: url(../../assets/menu.png);
-    margin-top: 10px;
+.play-container .play-reset {
+    position: absolute;
+    bottom: 10%;
+    right: 1%;
+    z-index: 2;
 }
 
-.play-content{
+.play-container .play-reset .btn-reset {
+    background-color: #938671;
+    border: none;
+}
+
+.play-container .play-content{
     position: absolute;
     right: 10px;
     width: 170px;
 }
 
-.play-zoom {
+.play-container .play-zoom {
     position: absolute;
     top: 10px;
     left: 10px;
     z-index: 2;
 }
 
-.play-count{
+.play-container .play-count{
     position: absolute;
     bottom: 5px;
     left: 10px;
 }
 
-.play-count > p {
+.play-container .play-count > p {
     font-size: 72px;
     margin: 0;
     opacity: 0.6;
-}
-
-.item-ele{
-    width: 100px;
-    height: 100px;
 }
 
 .item-ele > p {
@@ -269,7 +275,4 @@ const clearEle = () => {
     height: 75px;
 }
 
-.drop-box {
-    height: 100%;
-}
 </style>
