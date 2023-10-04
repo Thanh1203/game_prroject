@@ -5,7 +5,7 @@ const Elesdata = dataEles.dataElements;
 function getEleKey(data) {
   let result;
   Elesdata.forEach((element) => {
-    if (element.key.length == data.length && handleCheck(element.key, data)) {
+    if (handleCheck(element.key, data)) {
       result = element;
     }
   });

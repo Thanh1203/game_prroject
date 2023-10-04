@@ -126,17 +126,21 @@ function handleLogicDrop(id) {
         }
     })
     let natureMix = [itemdrop.name]
-    let tempNature = [itemdrop.id]
+    let idNature = [itemdrop.id]
     combineNature.value.filter(item => {
         if (item.id != itemdrop.id && checktop(itemdrop.y, item.y) && checkleft(itemdrop.x, item.x)) {
-            tempNature.push(item.id)
             natureMix.push(item.name)
         }
     })
     if (natureMix.length >= 2) {
         const newNature = handlerule(natureMix)
         if (newNature) {
-            const newIdNature = getNewIdNature(tempNature)
+            combineNature.value.filter(item => {
+                if (handleCheck(item.name, newNature.key)) {
+                    idNature.push(item.id)
+                }
+            })
+            const newIdNature = getNewIdNature(idNature)
             mapNewEle(newNature, newIdNature, itemdrop)
         }
     }
@@ -192,6 +196,10 @@ function handleDelte(id) {
     })
 }
 
+function handleCheck(data, itemKey) {
+    return itemKey.includes(data)
+}
+
 //handle option
 const clearEle = () => {
     combineNature.value = []
@@ -199,10 +207,9 @@ const clearEle = () => {
 }
 
 const resetGame = () => {
-    combineNature.value = []
-    storageLocal.setCombineNatureEle([])
-    store.dispatch("updateNature", defaultData)
+    computed(store.dispatch("updateNature", defaultData))
     storageLocal.setNatureEle(defaultData)
+    clearEle()
 }
 </script>
 <style>
