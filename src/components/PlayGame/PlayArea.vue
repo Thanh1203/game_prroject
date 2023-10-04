@@ -42,6 +42,7 @@ let isFullscreen = ref(false)
 const store = useStore();
 const natureElements = computed({
     get: () => store.state.natureElements,
+    set: (data) => store.commit('update', data)
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
 let combineNature = ref(storageLocal.getCombineNatureEle())
@@ -127,15 +128,17 @@ function handleLogicDrop(id) {
     })
     let natureMix = [itemdrop.name]
     let idNature = [itemdrop.id]
+    let arrNatureTemp = [itemdrop]
     combineNature.value.filter(item => {
         if (item.id != itemdrop.id && checktop(itemdrop.y, item.y) && checkleft(itemdrop.x, item.x)) {
             natureMix.push(item.name)
+            arrNatureTemp.push(item)
         }
     })
     if (natureMix.length >= 2) {
         const newNature = handlerule(natureMix)
         if (newNature) {
-            combineNature.value.filter(item => {
+            arrNatureTemp.filter(item => {
                 if (handleCheck(item.name, newNature.key)) {
                     idNature.push(item.id)
                 }
@@ -206,10 +209,11 @@ const clearEle = () => {
     storageLocal.setCombineNatureEle([])
 }
 
-const resetGame = () => {
-    computed(store.dispatch("updateNature", defaultData))
-    storageLocal.setNatureEle(defaultData)
+function resetGame() {
     clearEle()
+    const data = defaultData
+    storageLocal.setNatureEle(data)
+    store.commit('update', storageLocal.getNatureEle())
 }
 </script>
 <style>

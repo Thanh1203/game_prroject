@@ -5,7 +5,7 @@
                 <li v-for="(alphabet, index) in alphabets" :key="index" @click="scrollList">{{ alphabet }}</li>
             </ul>
         </div>
-        <draggable v-model="natureEleSort" :group="{ name: 'natureElements', pull: 'clone'}" 
+        <draggable v-model="natureElements" :group="{ name: 'natureElements', pull: 'clone'}" 
         item-key="name" class="element-container" :sort="false" :clone="cloneNature" @change="log">
             <template #item="{ element }">
                 <div class="nature-ele" @dragstart="dragStart($event)" :name="`${element.name}`">
@@ -28,7 +28,7 @@ const store = useStore()
 //handle drag
 const natureElements = computed({
     get: () => store.state.natureElements,
-    set: (data) => store.commit("update",data)
+    set: (data) => store.commit('update', data)
 })
 
 
@@ -45,20 +45,6 @@ if (getId.length == 0) {
     idCount = Math.max(...temp) + 1
 }
 
-const natureEleSort = computed(() => {
-    return natureElements.value.slice().sort(function (a, b) {
-        var nameA = a.name.toUpperCase();
-        var nameB = b.name.toUpperCase();
-        if (nameA < nameB) {
-            return -1;
-        }
-        if (nameA > nameB) {
-            return 1;
-        }
-        return 0;
-    });
-});
-
 const cloneNature = (item) => {
     const newItem = {
         id: idCount,
@@ -73,8 +59,6 @@ const cloneNature = (item) => {
 function dragStart(ev) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
-    // const newItem = JSON.stringify(cloneItem(item))
-    // ev.dataTransfer.setData('item', newItem)
     const dragItem = ev.target
     dragItem.id = idCount
     setTimeout(() => {
@@ -96,7 +80,7 @@ function log(ev) {
 //handle scroll
 function scrollList(ev) {
     const char = ev.target.innerHTML.toLowerCase()
-    const ele = natureEleSort.value.find((item) => item.name.startsWith(char))
+    const ele = natureElements.value.find((item) => item.name.startsWith(char))
     if (ele) {
         const htmlEle = document.getElementsByName(ele.name);
         if (htmlEle.length > 0) {

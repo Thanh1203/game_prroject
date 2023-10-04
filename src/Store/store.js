@@ -11,10 +11,22 @@ const store = createStore({
   mutations: {
     insert(state, data) {
       state.natureElements.push(data);
+      state.natureElements.sort(function (a, b) {
+        var nameA = a.name.toUpperCase();
+        var nameB = b.name.toUpperCase();
+        if (nameA < nameB) {
+          return -1;
+        }
+        if (nameA > nameB) {
+          return 1;
+        }
+        return 0;
+      });
       storageLocal.setNatureEle(state.natureElements);
     },
     update(state, data) {
       state.natureElements = data;
+      storageLocal.setNatureEle(data);
     },
   },
   actions: {
