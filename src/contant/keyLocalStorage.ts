@@ -1,6 +1,6 @@
 const NATURE_ELEMENTS = "NATURE_ELEMENTS";
 const COMBINE_NATURE = "COMBINE_NATURE";
-const defaultData = [
+const defaultData: {name: string, img: string}[] = [
   {
     name: "air",
     img: "air.png",

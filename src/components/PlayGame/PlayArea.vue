@@ -37,27 +37,13 @@ import draggable from 'vuedraggable'
 import handlerule from '@/handleRules/handleRule'
 import storageLocal from '@/Store/storageLocal'
 import { defaultData } from "@/contant/keyLocalStorage";
-
-
-interface itemInterface {
-    id: number;
-    name: string;
-    img: string;
-    x: number;
-    y: number
-}
-
-interface interfaceNewItem {
-    key?: string[];
-    name?: string;
-    img?: string
-}
+import { itemInterface, interfaceNewItem } from "@/contantInterface/index"
 
 let isFullscreen = ref(false)
 const store = useStore();
 const natureElements = computed({
     get: () => store.state.natureElements,
-    set: (data) => console.log(data)
+    set: (data) => store.commit('update', data)
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
 let combineNature = ref(storageLocal.getCombineNatureEle())
@@ -194,13 +180,13 @@ function mapNewEle(currentEle: interfaceNewItem, idEle: number, positionEle: any
         x: positionEle.x,
         y: positionEle.y
     }
-    const otherData = {
+    const otherData: { name: string | undefined, img: string | undefined} = {
         name: data.name,
         img: data.img
     }
     combineNature.value.push(data)
     storageLocal.setCombineNatureEle(combineNature.value)
-    const check = natureElements.value.find((item: {name: string, img: string}) => {
+    const check: { name: string | undefined, img: string | undefined } = natureElements.value.find((item: {name: string, img: string}) => {
         return item.name == otherData.name
     })
     if (!check) {
