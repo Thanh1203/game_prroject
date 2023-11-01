@@ -19,13 +19,11 @@
         </div>
     </div>
 </template>
-<script>
-export default {
-    methods: {
-        goPlay() {
-            this.$router.push("/Play")
-        }
-    }
+<script setup lang="ts">
+import router from '@/Router/router';
+
+function goPlay(): void {
+    router.push('/play')
 }
 </script>
 <style>

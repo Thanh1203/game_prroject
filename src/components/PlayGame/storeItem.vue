@@ -16,7 +16,7 @@
         </draggable>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
 import { computed, ref } from 'vue';
@@ -33,19 +33,19 @@ const natureElements = computed({
 
 
 const getId = storageLocal.getCombineNatureEle()
-let idCount
-let temp = []
+let idCount : number
+let temp : number[] = []
 
 if (getId.length == 0) {
     idCount = 0
 } else {
-    getId.forEach(item => {
+    getId.forEach((item : {id : number}) => {
         temp.push(item.id)
     })
     idCount = Math.max(...temp) + 1
 }
 
-const cloneNature = (item) => {
+const cloneNature = (item:{id: number, name: string, img: string, x: number, y: number}) => {
     const newItem = {
         id: idCount,
         name: item.name,
@@ -56,7 +56,7 @@ const cloneNature = (item) => {
     return newItem;
 }
 
-function dragStart(ev) {
+function dragStart(ev : any) {
     ev.dataTransfer.dropEffect = 'move'
     ev.dataTransfer.effectAllowed = 'move'
     const dragItem = ev.target
@@ -64,12 +64,12 @@ function dragStart(ev) {
     setTimeout(() => {
         idCount++
     }, 1);
-    ev.dataTransfer.setData("itemDragId", dragItem.id)
+    ev.dataTransfer.setData("itemDragId",parseInt(dragItem.id))
 }
 
-function log(ev) {
+function log(ev : any) {
     if (ev.added) {
-        natureElements.value.forEach((item, index) => {
+        natureElements.value.forEach((item:any, index: number) => {
             if (Object.prototype.hasOwnProperty.call(item, 'id')) {
                 natureElements.value.splice(index, 1);
             }
@@ -78,9 +78,9 @@ function log(ev) {
 }
 
 //handle scroll
-function scrollList(ev) {
+function scrollList(ev : any) {
     const char = ev.target.innerHTML.toLowerCase()
-    const ele = natureElements.value.find((item) => item.name.startsWith(char))
+    const ele = natureElements.value.find((item:any) => item.name.startsWith(char))
     if (ele) {
         const htmlEle = document.getElementsByName(ele.name);
         if (htmlEle.length > 0) {

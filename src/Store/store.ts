@@ -11,9 +11,9 @@ const store = createStore({
   mutations: {
     insert(state, data) {
       state.natureElements.push(data);
-      state.natureElements.sort(function (a, b) {
-        var nameA = a.name.toUpperCase();
-        var nameB = b.name.toUpperCase();
+      state.natureElements.sort(function (a:any, b:any) {
+        const nameA = a.name.toUpperCase();
+        const nameB = b.name.toUpperCase();
         if (nameA < nameB) {
           return -1;
         }
