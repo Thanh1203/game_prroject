@@ -39,18 +39,18 @@ import storageLocal from '@/Store/storageLocal'
 import { defaultData } from "@/contant/keyLocalStorage";
 import { itemInterface, interfaceNewItem } from "@/contantInterface/index"
 
-let isFullscreen = ref(false)
+const isFullscreen = ref<boolean>(false);
 const store = useStore();
 const natureElements = computed({
     get: () => store.state.natureElements,
     set: (data) => store.commit('update', data)
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
-let combineNature = ref(storageLocal.getCombineNatureEle())
+const combineNature = ref<any>(storageLocal.getCombineNatureEle());
 
 
 // function handle
-const fullScreen = () => {
+const fullScreen = (): any => {
     isFullscreen.value = !isFullscreen.value
     if (!document.fullscreenElement) {
         // Chuyển sang chế độ toàn màn hình
@@ -77,21 +77,21 @@ const fullScreen = () => {
     }
 }
 
-async function drop(ev: any) {
+const drop = async (ev: any) => {
     ev.preventDefault();
-    const idItemDrop : string = ev.dataTransfer.getData('itemDragId')
+    const idItemDrop: string = ev.dataTransfer.getData('itemDragId');
     combineNature.value.find((item : itemInterface)=> {
-        if (item.id == parseInt(idItemDrop)) {
-            item.x = ev.x - 50
-            item.y = ev.y - 50
+        if (item.id === parseInt(idItemDrop)) {
+            item.x = ev.x - 50;
+            item.y = ev.y - 50;
         }
     })
     await setStyle(parseInt(idItemDrop), ev.x, ev.y);
-    handleLogicDrop(parseInt(idItemDrop))
-    storageLocal.setCombineNatureEle(combineNature.value)
+    handleLogicDrop(parseInt(idItemDrop));
+    storageLocal.setCombineNatureEle(combineNature.value);
 }
 
-async function setStyle(id: number, x: number, y: number) {
+const setStyle = async (id: number, x: number, y: number) => {
     return new Promise<void>((resolve) => {
         setTimeout(() => {
             combineNature.value.find((item: itemInterface)=> {
@@ -105,124 +105,123 @@ async function setStyle(id: number, x: number, y: number) {
     })
 }
 
-function log(ev:any) {
+const log = (ev:any): any => {
     if (ev.removed) {
-        storageLocal.setCombineNatureEle(combineNature.value)
+        storageLocal.setCombineNatureEle(combineNature.value);
     }
 }
 
 //get data item
-function dragstart(ev:any) {
-    ev.dataTransfer.dropEffect = 'move'
-    ev.dataTransfer.effectAllowed = 'move'
-    ev.dataTransfer.setData("itemDragId", ev.target.id)
+const dragstart = (ev:any): any => {
+    ev.dataTransfer.dropEffect = 'move';
+    ev.dataTransfer.effectAllowed = 'move';
+    ev.dataTransfer.setData("itemDragId", ev.target.id);
 }
 
-
 // handle logic
-function handleLogicDrop(id: number) {
+const handleLogicDrop = (id: number): any => {
     let itemdrop: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number } = {
         x: 0,
         y: 0
-    }
+    };
     itemdrop = combineNature.value.find((item: itemInterface) => {
-        return item.id === id
-    })
+        return item.id === id;
+    });
 
     if (itemdrop && itemdrop.name && itemdrop.id && (typeof itemdrop.x === 'number') && (typeof itemdrop.y === 'number')) {
-        let natureMix: string[] = [itemdrop.name]
-        let idNature: number[] = [itemdrop.id]
-        let arrNatureTemp: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number }[] = [itemdrop]
+        let natureMix: string[] = [itemdrop.name];
+        let idNature: number[] = [itemdrop.id];
+        let arrNatureTemp: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number }[] = [itemdrop];
 
         combineNature.value.filter((item: itemInterface) => {
             if (item.id != itemdrop.id && checkLocation(itemdrop.y, item.y) && checkLocation(itemdrop.x, item.x)) {
-                natureMix.push(item.name)
-                arrNatureTemp.push(item)
+                natureMix.push(item.name);
+                arrNatureTemp.push(item);
             }
-        })
+        });
 
         if (natureMix.length >= 2) {
-            const newNature: interfaceNewItem = handlerule(natureMix)
+            const newNature: interfaceNewItem = handlerule(natureMix);
             if (!isEmptyObject(newNature) && newNature.key !== undefined) {
                 arrNatureTemp.filter((item: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number }) => {
                     if (item.name !== undefined && item.id !== undefined) {
                         if (handleCheck(item.name, newNature.key!)) {
-                            idNature.push(item.id)
+                            idNature.push(item.id);
                         }
                     }
                 })
-                const newIdNature = getNewIdNature(idNature)
-                mapNewEle(newNature, newIdNature, itemdrop)
+                const newIdNature = getNewIdNature(idNature);
+                mapNewEle(newNature, newIdNature, itemdrop);
             }
         }
     }
 }
 
-function checkLocation(data : number, value : number): boolean {
-    const start = data - 60
-    const end = data + 60
+const checkLocation = (data : number, value : number): boolean => {
+    const start = data - 60;
+    const end = data + 60;
     return value >= start && value <= end;
 }
 
-function getNewIdNature(arr : number[]) {
-    const result: number = Math.min(...arr)
+const getNewIdNature = (arr : number[]): any => {
+    const result: number = Math.min(...arr);
     arr.forEach((item: number) => {
-        handleDelte(item)
+        handleDelte(item);
     })
-    return result
+    return result;
 }
 
-function mapNewEle(currentEle: interfaceNewItem, idEle: number, positionEle: any) {
-    const data: { id: number, name?: string, img?: string, x: number, y: number} = {
+const mapNewEle = (currentEle: interfaceNewItem, idEle: number, positionEle: any): any => {
+    const data: { id: number, name?: string, img?: string, x: number, y: number } = {
         id: idEle,
         name: currentEle.name,
         img: currentEle.img,
         x: positionEle.x,
         y: positionEle.y
-    }
-    const otherData: { name: string | undefined, img: string | undefined} = {
+    };
+    const otherData: { name: string | undefined, img: string | undefined } = {
         name: data.name,
         img: data.img
-    }
-    combineNature.value.push(data)
-    storageLocal.setCombineNatureEle(combineNature.value)
-    const check: { name: string | undefined, img: string | undefined } = natureElements.value.find((item: {name: string, img: string}) => {
-        return item.name == otherData.name
-    })
+    };
+    combineNature.value.push(data);
+    storageLocal.setCombineNatureEle(combineNature.value);
+    const check: { name: string | undefined, img: string | undefined } = natureElements.value.find((item: { name: string, img: string }) => {
+        return item.name == otherData.name;
+    });
     if (!check) {
-        store.dispatch('insertNature', otherData)
+        store.dispatch('insertNature', otherData);
     }
 }
 
-function handleDelte(id: number) {
+const handleDelte = (id: number): any => {
     combineNature.value.forEach((ele: itemInterface, index: string) => {
         if (ele.id === id) {
-            combineNature.value.splice(index, 1)
+            combineNature.value.splice(index, 1);
         }
-    })
+    });
 }
 
-function handleCheck(data: string, itemKey: string[]) {
-    return itemKey.includes(data)
+const handleCheck = (data: string, itemKey: string[]): any => {
+    return itemKey.includes(data);
 }
 
 //handle option
-const clearEle = () => {
-    combineNature.value = []
-    storageLocal.setCombineNatureEle([])
+const clearEle = (): any => {
+    combineNature.value = [];
+    storageLocal.setCombineNatureEle([]);
 }
 
-function resetGame() {
-    clearEle()
-    storageLocal.setNatureEle(defaultData)
-    store.commit('update', storageLocal.getNatureEle())
+const resetGame = (): any => {
+    clearEle();
+    storageLocal.setNatureEle(defaultData);
+    store.commit('update', storageLocal.getNatureEle());
 }
 
-function isEmptyObject(obj: any) {
+const isEmptyObject = (obj: any): any => {
     return Object.keys(obj).length === 0;
 }
 </script>
-<style>
+<style scoped>
 .play-container {
     height: 100%;
     width: calc(100% - 280px);

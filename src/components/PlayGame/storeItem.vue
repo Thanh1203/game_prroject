@@ -23,29 +23,28 @@ import { computed, ref } from 'vue';
 import storageLocal from '@/Store/storageLocal';
 
 const alphabets = ref('abcdefghijklmnopqrstuvwxyz'.toUpperCase().split(''));
-const store = useStore()
+const store = useStore();
 
 //handle drag
 const natureElements = computed({
     get: () => store.state.natureElements,
     set: (data) => store.commit('update', data)
-})
+});
 
-
-const getId = storageLocal.getCombineNatureEle()
-let idCount : number
-let temp : number[] = []
+const getId = storageLocal.getCombineNatureEle();
+let idCount: number;
+let temp: number[] = [];
 
 if (getId.length == 0) {
-    idCount = 0
+    idCount = 0;
 } else {
     getId.forEach((item : {id : number}) => {
-        temp.push(item.id)
+        temp.push(item.id);
     })
-    idCount = Math.max(...temp) + 1
+    idCount = Math.max(...temp) + 1;
 }
 
-const cloneNature = (item:{id: number, name: string, img: string, x: number, y: number}) => {
+const cloneNature = (item:{id: number, name: string, img: string, x: number, y: number}): any => {
     const newItem = {
         id: idCount,
         name: item.name,
@@ -56,18 +55,18 @@ const cloneNature = (item:{id: number, name: string, img: string, x: number, y: 
     return newItem;
 }
 
-function dragStart(ev : any) {
-    ev.dataTransfer.dropEffect = 'move'
-    ev.dataTransfer.effectAllowed = 'move'
-    const dragItem = ev.target
-    dragItem.id = idCount
+const dragStart = (ev : any): any => {
+    ev.dataTransfer.dropEffect = 'move';
+    ev.dataTransfer.effectAllowed = 'move';
+    const dragItem = ev.target;
+    dragItem.id = idCount;
     setTimeout(() => {
         idCount++
     }, 1);
-    ev.dataTransfer.setData("itemDragId",parseInt(dragItem.id))
+    ev.dataTransfer.setData("itemDragId", parseInt(dragItem.id));
 }
 
-function log(ev : any) {
+const log = (ev : any): any => {
     if (ev.added) {
         natureElements.value.forEach((item:any, index: number) => {
             if (Object.prototype.hasOwnProperty.call(item, 'id')) {
@@ -78,9 +77,9 @@ function log(ev : any) {
 }
 
 //handle scroll
-function scrollList(ev : any) {
-    const char = ev.target.innerHTML.toLowerCase()
-    const ele = natureElements.value.find((item:any) => item.name.startsWith(char))
+const scrollList = (ev : any):any => {
+    const char = ev.target.innerHTML.toLowerCase();
+    const ele = natureElements.value.find((item: any) => item.name.startsWith(char));
     if (ele) {
         const htmlEle = document.getElementsByName(ele.name);
         if (htmlEle.length > 0) {
@@ -91,7 +90,7 @@ function scrollList(ev : any) {
     }
 }
 </script>
-<style>
+<style scoped>
 .slide-store{
     width: 280px;
     height: 100%;
