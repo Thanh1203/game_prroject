@@ -96,8 +96,8 @@ const setStyle = async (id: number, x: number, y: number) => {
         setTimeout(() => {
             combineNature.value.find((item: itemInterface)=> {
                 if (item.id === id) {
-                    item.x = x - 50,
-                    item.y = y - 50
+                    item.x = x - 50;
+                    item.y = y - 50;
                 }
             })
             resolve();
