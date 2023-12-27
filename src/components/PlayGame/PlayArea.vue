@@ -16,13 +16,13 @@
         <draggable v-model="combineNature" group="natureElements" 
         item-key="id" class="drop-box" @drop="drop" @change="log" style="height: 100%;"> 
             <template #item="{ element }" >
-                <div class="item-ele" :id="`${ element.id }`" 
+                <div class="item-ele" :id="`${ element.id }`" draggable="true" @dragstart="dragStart" @mousedown="handleMouseDown" 
                 :style="{
                     opacity: element.x === 0 ? 0 : 1,
                     top: `${element.y}px`,
                     left: `${element.x}px`,
                     position: 'absolute'
-                }" draggable="true" @dragstart="dragstart($event)">
+                }">
                     <img :src="require(`@/assets/${element.img}`)" :alt="`${element.name}`" class="ele-img-play">
                     <p>{{ element.name }}</p>
                 </div>
@@ -31,7 +31,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, ref} from 'vue';
+import { computed, reactive, ref} from 'vue';
 import { useStore } from 'vuex';
 import draggable from 'vuedraggable'
 import handlerule from '@/handleRules/handleRule'
@@ -47,7 +47,14 @@ const natureElements = computed({
 })
 const natureElementsLength = computed(() => store.state.natureElements.length);
 const combineNature = ref<any>(storageLocal.getCombineNatureEle());
-
+const localMouse = reactive({
+    x: null || 0,
+    y: null || 0
+});
+const localEle = reactive({
+    x: null || 0,
+    y: null || 0
+})
 
 // function handle
 const fullScreen = (): any => {
@@ -80,13 +87,16 @@ const fullScreen = (): any => {
 const drop = async (ev: any) => {
     ev.preventDefault();
     const idItemDrop: string = ev.dataTransfer.getData('itemDragId');
-    combineNature.value.find((item : itemInterface)=> {
-        if (item.id === parseInt(idItemDrop)) {
-            item.x = ev.x - 50;
-            item.y = ev.y - 50;
-        }
-    })
-    await setStyle(parseInt(idItemDrop), ev.x, ev.y);
+    if (!handleCheckEle(parseInt(idItemDrop))) {
+        await setStyle(parseInt(idItemDrop), ev.x, ev.y);
+    } else {
+        combineNature.value.find((item : itemInterface)=> {
+            if (item.id === parseInt(idItemDrop)) {
+                item.x = ev.x - localEle.x;
+                item.y = ev.y - localEle.y;
+            }
+        })
+    }
     handleLogicDrop(parseInt(idItemDrop));
     storageLocal.setCombineNatureEle(combineNature.value);
 }
@@ -112,7 +122,11 @@ const log = (ev:any): any => {
 }
 
 //get data item
-const dragstart = (ev:any): any => {
+const dragStart = (ev: any): any => {
+    const rect = ev.target.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    calculatorPositionEle(centerX, centerY);
     ev.dataTransfer.dropEffect = 'move';
     ev.dataTransfer.effectAllowed = 'move';
     ev.dataTransfer.setData("itemDragId", ev.target.id);
@@ -125,28 +139,28 @@ const handleLogicDrop = (id: number): any => {
         y: 0
     };
     itemdrop = combineNature.value.find((item: itemInterface) => {
-        return item.id === id;
+        return item?.id === id;
     });
 
-    if (itemdrop && itemdrop.name && itemdrop.id && (typeof itemdrop.x === 'number') && (typeof itemdrop.y === 'number')) {
-        let natureMix: string[] = [itemdrop.name];
-        let idNature: number[] = [itemdrop.id];
+    if (itemdrop && itemdrop?.name && itemdrop?.id && (typeof itemdrop?.x === 'number') && (typeof itemdrop?.y === 'number')) {
+        let natureMix: string[] = [itemdrop?.name];
+        let idNature: number[] = [itemdrop?.id];
         let arrNatureTemp: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number }[] = [itemdrop];
 
         combineNature.value.filter((item: itemInterface) => {
-            if (item.id != itemdrop.id && checkLocation(itemdrop.y, item.y) && checkLocation(itemdrop.x, item.x)) {
-                natureMix.push(item.name);
+            if (item?.id != itemdrop?.id && checkLocation(itemdrop?.y, item.y) && checkLocation(itemdrop?.x, item?.x)) {
+                natureMix.push(item?.name);
                 arrNatureTemp.push(item);
             }
         });
 
-        if (natureMix.length >= 2) {
+        if (natureMix?.length >= 2) {
             const newNature: interfaceNewItem = handlerule(natureMix);
-            if (!isEmptyObject(newNature) && newNature.key !== undefined) {
+            if (!isEmptyObject(newNature) && newNature?.key !== undefined) {
                 arrNatureTemp.filter((item: { id?: number | undefined, name?: string | undefined, img?: string, x: number, y: number }) => {
-                    if (item.name !== undefined && item.id !== undefined) {
-                        if (handleCheck(item.name, newNature.key!)) {
-                            idNature.push(item.id);
+                    if (item?.name !== undefined && item?.id !== undefined) {
+                        if (handleCheck(item?.name, newNature?.key!)) {
+                            idNature.push(item?.id);
                         }
                     }
                 })
@@ -184,9 +198,9 @@ const mapNewEle = (currentEle: interfaceNewItem, idEle: number, positionEle: any
         img: data.img
     };
     combineNature.value.push(data);
-    storageLocal.setCombineNatureEle(combineNature.value);
+    storageLocal.setCombineNatureEle(combineNature?.value);
     const check: { name: string | undefined, img: string | undefined } = natureElements.value.find((item: { name: string, img: string }) => {
-        return item.name == otherData.name;
+        return item?.name == otherData?.name;
     });
     if (!check) {
         store.dispatch('insertNature', otherData);
@@ -205,6 +219,16 @@ const handleCheck = (data: string, itemKey: string[]): any => {
     return itemKey.includes(data);
 }
 
+const handleCheckEle = (idItemDrop: number): boolean => {
+    return combineNature.value.find((item: itemInterface) => {
+        return item.id === idItemDrop;
+    })
+}
+
+const handleMouseDown = (e: any): any => {
+    localMouse.x = e.x;
+    localMouse.y = e.y;
+}
 //handle option
 const clearEle = (): any => {
     combineNature.value = [];
@@ -219,6 +243,11 @@ const resetGame = (): any => {
 
 const isEmptyObject = (obj: any): any => {
     return Object.keys(obj).length === 0;
+}
+
+const calculatorPositionEle = (centerX: number, centerY: number): any => {
+    localEle.x = 50 - (centerX - localMouse?.x);
+    localEle.y = 50 - (centerY - localMouse?.y);
 }
 </script>
 <style scoped>
