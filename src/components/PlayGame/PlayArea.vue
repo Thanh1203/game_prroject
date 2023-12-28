@@ -1,10 +1,8 @@
 <template>
     <div class="play-container">
-        <div class="play-icon">
-            <div class="icon iconClear" @click="clearEle"></div>
-        </div>
-        <div class="play-reset">
+        <div class="playOption">
             <button class="btn btn-primary btn-reset btn-sm" type="reset" value="Reset" @click="resetGame">Reset</button>
+            <div class="icon iconClear" @click="clearEle"></div>
         </div>
         <div class="play-content">
             <a href="https://littlealchemy2.com/" class="txt_link">Little Alchemy 2 is out now!</a>
@@ -12,7 +10,7 @@
         <div class="play-zoom" @click="fullScreen">
            <font-awesome-icon :icon="isFullscreen ? ['fas', 'minimize'] : ['fas', 'maximize']" size="2xl" style="color: #938671;" class="icon"/>
         </div>
-        <div class="play-count"><p>{{ natureElementsLength }} / 580 </p></div>
+        <div class="play-count">{{ natureElementsLength }} / 580 </div>
         <draggable v-model="combineNature" group="natureElements" 
         item-key="id" class="drop-box" @drop="drop" @change="log" style="height: 100%;"> 
             <template #item="{ element }" >
@@ -260,53 +258,48 @@ const calculatorPositionEle = (centerX: number, centerY: number): any => {
     left: 0;
 }
 
-.play-container .play-icon{
+.play-container .playOption {
+    z-index: 99;
+    position: absolute;
+    bottom: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
-    width: 35px;
-    position: absolute;
-    bottom: 10px;
-    right: 15px;
-    z-index: 2;
+    align-items: center;
+    padding: 0 12px 12px 0;
 }
 
-.play-container .play-icon .iconClear {
+.playOption .iconClear {
     background-image: url(../../assets/clear.png);
-    margin-top: 10px;
 }
 
-.play-container .play-reset {
-    position: absolute;
-    bottom: 50px;
-    right: 1%;
-    z-index: 2;
-}
-
-.play-container .play-reset .btn-reset {
+.playOption .btn-reset {
     background-color: #938671;
     border: none;
+    height: 29px;
+    width: 50px;
+    margin-bottom: 10px;
 }
 
 .play-container .play-content{
+    z-index: 99;
     position: absolute;
-    right: 10px;
+    right: 1%;
+    top: 1.5%;
     width: 170px;
 }
 
 .play-container .play-zoom {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 2;
+    z-index: 99;
+    top: 1%;
+    left: 1%;
 }
 
 .play-container .play-count{
     position: absolute;
-    bottom: 5px;
-    left: 10px;
-}
-
-.play-container .play-count > p {
+    bottom: 0;
+    left: 1%;
     font-size: 72px;
     margin: 0;
     opacity: 0.6;
