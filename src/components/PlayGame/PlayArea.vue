@@ -277,7 +277,7 @@ const calculatorPositionEle = (centerX: number, centerY: number): any => {
 
 .play-container .play-reset {
     position: absolute;
-    bottom: 6%;
+    bottom: 50px;
     right: 1%;
     z-index: 2;
 }
