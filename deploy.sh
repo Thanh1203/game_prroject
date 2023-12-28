@@ -2,7 +2,7 @@ set -e
 
 yarn build
 
-cd list
+cd dist
 
 git init
 git add .
