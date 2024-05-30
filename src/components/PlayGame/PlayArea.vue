@@ -95,7 +95,7 @@ const drop = async (ev: any) => {
             }
         })
     }
-    handleLogicDrop(parseInt(idItemDrop));
+    await handleLogicDrop(parseInt(idItemDrop));
     storageLocal.setCombineNatureEle(combineNature.value);
 }
 
@@ -186,14 +186,14 @@ const getNewIdNature = (arr : number[]): any => {
 const mapNewEle = (currentEle: interfaceNewItem, idEle: number, positionEle: any): any => {
     const data: { id: number, name?: string, img?: string, x: number, y: number } = {
         id: idEle,
-        name: currentEle.name,
-        img: currentEle.img,
-        x: positionEle.x,
-        y: positionEle.y
+        name: currentEle?.name,
+        img: currentEle?.img,
+        x: positionEle?.x,
+        y: positionEle?.y
     };
     const otherData: { name: string | undefined, img: string | undefined } = {
-        name: data.name,
-        img: data.img
+        name: data?.name,
+        img: data?.img
     };
     combineNature.value.push(data);
     storageLocal.setCombineNatureEle(combineNature?.value);
@@ -207,7 +207,7 @@ const mapNewEle = (currentEle: interfaceNewItem, idEle: number, positionEle: any
 
 const handleDelte = (id: number): any => {
     combineNature.value.forEach((ele: itemInterface, index: string) => {
-        if (ele.id === id) {
+        if (ele?.id === id) {
             combineNature.value.splice(index, 1);
         }
     });
